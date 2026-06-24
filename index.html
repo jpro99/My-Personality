@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Color Survey Teaching App — teacher codes, QR sharing, and team-building guidance." />
+  <meta name="theme-color" content="#01696f" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <title>Color Survey Teaching App</title>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Color Survey</h1>
+          <p class="muted">Teacher codes, score lookup, QR sharing, partner analysis, and team-building guidance.</p>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary" id="themeToggle" aria-label="Toggle dark mode">Theme</button>
+    </header>
+
+    <section class="panel setup-panel">
+      <div class="grid-3">
+        <div>
+          <h2>Student setup</h2>
+          <label for="studentName">Student name</label>
+          <input class="input" id="studentName" placeholder="Enter name" autocomplete="name" />
+          <label for="groupName" class="label-spaced">Class or group</label>
+          <input class="input" id="groupName" placeholder="Optional" autocomplete="organization" />
+        </div>
+        <div>
+          <h2>Question variation</h2>
+          <label for="questionSet">Question set</label>
+          <select id="questionSet" class="input">
+            <option value="classic">Classic set</option>
+            <option value="variantA">Variant A</option>
+            <option value="variantB">Variant B</option>
+          </select>
+          <p class="small label-spaced">Alternate wording reduces repeat memorization while keeping the same color scoring.</p>
+        </div>
+        <div>
+          <h2>Quick actions</h2>
+          <div class="actions">
+            <button type="button" class="btn btn-primary" id="startBtn">Start over</button>
+            <button type="button" class="btn btn-secondary" id="sampleBtn">Load sample</button>
+            <button type="button" class="btn btn-secondary" id="saveBtn">Save result</button>
+            <button type="button" class="btn btn-secondary" id="printBtn">Print summary</button>
+          </div>
+        </div>
+      </div>
+      <div class="legend" aria-label="Answer key">
+        <span class="pill"><span class="dot dot-blue"></span>C = Blue</span>
+        <span class="pill"><span class="dot dot-gold"></span>D = Gold</span>
+        <span class="pill"><span class="dot dot-green"></span>B = Green</span>
+        <span class="pill"><span class="dot dot-orange"></span>A = Orange</span>
+      </div>
+    </section>
+
+    <section class="panel" id="surveyPanel">
+      <div id="warningBox" class="warning hidden" role="alert"></div>
+      <div id="successBox" class="success hidden" role="status"></div>
+      <div id="questions"></div>
+    </section>
+
+    <section class="panel hidden" id="resultsPanel" aria-live="polite">
+      <h2>Results and coaching</h2>
+      <p class="muted">Tap any score card or color below to learn what each color means — teamwork, marriage, growth, and more. Tied scores count equally.</p>
+      <div class="grid-4" id="scoreCards"></div>
+      <p id="weakColorNote" class="weak-note hidden" role="note"></p>
+      <div class="grid-2 section-gap">
+        <div class="profile-box">
+          <h3 id="primaryTitle"></h3>
+          <p id="primarySummary"></p>
+          <p class="small" id="primaryTraits"></p>
+        </div>
+        <div class="profile-box">
+          <h3 id="secondaryTitle"></h3>
+          <p id="secondarySummary"></p>
+          <p class="small" id="secondaryTraits"></p>
+        </div>
+      </div>
+      <div class="grid-2 section-gap">
+        <div class="lesson">
+          <h3>Teacher lookup code</h3>
+          <p>Give the student this score code. Enter it in teacher tools to rebuild their result.</p>
+          <div class="kpi">
+            <h4 id="teacherCode"></h4>
+            <p class="small" id="teacherCodeHelp"></p>
+            <div class="actions inline-actions">
+              <button type="button" class="btn btn-secondary" id="copyCodeBtn">Copy code</button>
+              <button type="button" class="btn btn-secondary" id="copyLinkBtn">Copy share link</button>
+            </div>
+          </div>
+        </div>
+        <div class="lesson">
+          <h3>QR sharing card</h3>
+          <div class="qr-wrap">
+            <div id="qrBox" class="qr-box"></div>
+            <div>
+              <p id="qrSummary"></p>
+              <p class="small">Scanning opens a share view with communication guidance. Requires HTTPS or localhost for best results.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="colorPills" class="color-pills-wrap section-gap"></div>
+
+      <div class="tabs" id="resultTabs" role="tablist" aria-label="Result sections">
+        <button type="button" class="tab active" role="tab" data-tab="studentcard" aria-selected="true">My card</button>
+        <button type="button" class="tab" role="tab" data-tab="explore" aria-selected="false">What is this color?</button>
+        <button type="button" class="tab" role="tab" data-tab="communication" aria-selected="false">Communication</button>
+        <button type="button" class="tab" role="tab" data-tab="teamwork" aria-selected="false">Teamwork</button>
+        <button type="button" class="tab" role="tab" data-tab="relationships" aria-selected="false">Relationships</button>
+        <button type="button" class="tab" role="tab" data-tab="growth" aria-selected="false">Growth</button>
+        <button type="button" class="tab" role="tab" data-tab="deepdive" aria-selected="false">Deep dive</button>
+        <button type="button" class="tab" role="tab" data-tab="facilitator" aria-selected="false">Facilitator notes</button>
+      </div>
+
+      <div id="tabContentMount" class="tab-content-mount" role="region" aria-label="Color details"></div>
+
+      <p class="small muted disclaimer">This tool supports classroom conversation — it is not a clinical or employment assessment.</p>
+    </section>
+
+    <section class="panel" id="teacherTools">
+      <h2>Teacher tools</h2>
+      <p class="small muted" id="codeFormatHelp"></p>
+      <div class="grid-3 section-gap">
+        <div class="lesson">
+          <h3>Lookup by code</h3>
+          <label for="lookupCode">Enter score code</label>
+          <input class="input" id="lookupCode" placeholder="Example: Bl34-Yl29-Gn18-Or19" />
+          <div class="actions inline-actions">
+            <button type="button" class="btn btn-primary" id="lookupBtn">Decode code</button>
+          </div>
+        </div>
+        <div class="lesson">
+          <h3>Manual score entry</h3>
+          <label for="manualBlue">Blue (10–40)</label>
+          <input class="input" id="manualBlue" type="number" min="0" max="40" />
+          <label for="manualGold" class="label-spaced">Gold (10–40)</label>
+          <input class="input" id="manualGold" type="number" min="0" max="40" />
+          <label for="manualGreen" class="label-spaced">Green (10–40)</label>
+          <input class="input" id="manualGreen" type="number" min="0" max="40" />
+          <label for="manualOrange" class="label-spaced">Orange (10–40)</label>
+          <input class="input" id="manualOrange" type="number" min="0" max="40" />
+          <div class="actions inline-actions">
+            <button type="button" class="btn btn-primary" id="manualBtn">Analyze scores</button>
+          </div>
+        </div>
+        <div class="lesson">
+          <h3>Team scanner</h3>
+          <label for="teamCodes">Paste score codes, one per line</label>
+          <textarea id="teamCodes" class="input" rows="9" placeholder="Bl34-Yl29-Gn18-Or19&#10;Bl21-Yl31-Gn24-Or24"></textarea>
+          <div class="actions inline-actions">
+            <button type="button" class="btn btn-primary" id="teamBtn">Build team advice</button>
+          </div>
+        </div>
+      </div>
+      <div id="teacherOutput" class="grid-2 section-gap"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Background on each color</h2>
+      <div class="grid-2" id="backgroundGrid"></div>
+    </section>
+
+    <section class="panel" id="savedPanel">
+      <div class="saved-header">
+        <div>
+          <h2>Saved student results</h2>
+          <p class="muted">Stored in this browser only. Export for your records.</p>
+        </div>
+        <button type="button" class="btn btn-secondary" id="exportCsvBtn">Export CSV</button>
+      </div>
+      <div id="savedList" class="save-list"></div>
+    </section>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
